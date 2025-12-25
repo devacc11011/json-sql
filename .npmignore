@@ -1,0 +1,9 @@
+src/
+.next/
+example/
+tsconfig.json
+tsup.config.ts
+tailwind.config.ts
+postcss.config.js
+.gitignore
+.eslintrc.json
