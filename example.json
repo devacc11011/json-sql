@@ -1,0 +1,85 @@
+[
+  {
+    "id": 1,
+    "user": {
+      "name": "Alice Wonderland",
+      "email": "alice@example.com",
+      "profile": {
+        "age": 28,
+        "active": true
+      },
+      "address": {
+        "city": "Seoul",
+        "zip": "04524",
+        "geo": {
+          "lat": 37.5665,
+          "lng": 126.9780
+        }
+      }
+    },
+    "tags": ["premium", "new-user"],
+    "orders": [
+      {
+        "id": "ord_001",
+        "date": "2024-01-15",
+        "total": 54000,
+        "items": [
+          { "product_id": "p_10", "name": "Wireless Mouse", "qty": 1, "price": 24000 },
+          { "product_id": "p_11", "name": "Keyboard", "qty": 1, "price": 30000 }
+        ]
+      },
+      {
+        "id": "ord_005",
+        "date": "2024-02-01",
+        "total": 12000,
+        "items": [
+          { "product_id": "p_22", "name": "USB Cable", "qty": 2, "price": 6000 }
+        ]
+      }
+    ]
+  },
+  {
+    "id": 2,
+    "user": {
+      "name": "Bob Builder",
+      "email": "bob@build.it",
+      "profile": {
+        "age": 35,
+        "active": false
+      },
+      "address": {
+        "city": "Busan",
+        "zip": "47200",
+        "geo": {
+          "lat": 35.1796,
+          "lng": 129.0756
+        }
+      }
+    },
+    "tags": ["contractor"],
+    "orders": []
+  },
+  {
+    "id": 3,
+    "user": {
+      "name": "Charlie Chocolate",
+      "email": null,
+      "profile": null,
+      "address": {
+        "city": "Incheon",
+        "zip": "22000"
+      }
+    },
+    "tags": [],
+    "orders": [
+       {
+        "id": "ord_099",
+        "date": "2024-03-10",
+        "total": 150000,
+        "items": [
+          { "product_id": "p_50", "name": "Headset", "qty": 1, "price": 150000 }
+        ]
+      }
+    ]
+  }
+]

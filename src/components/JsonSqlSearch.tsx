@@ -9,22 +9,25 @@ import { initDuckDB, loadTable, executeQuery, formatError } from '../lib/sqlEngi
 // Lazy load Monaco Editor
 const SqlEditor = React.lazy(() => import('./SqlEditor'));
 
+import * as duckdb from '@duckdb/duckdb-wasm';
+
+// ... imports ...
+
 export interface JsonSqlSearchProps {
   initialData?: any;
   className?: string;
+  renderResult?: (data: any[], error: string | null) => React.ReactNode;
+  duckdbBundles?: duckdb.DuckDBBundles;
 }
 
-export default function JsonSqlSearch({ initialData, className }: JsonSqlSearchProps) {
-  const [schema, setSchema] = useState<ColumnSchema[]>([]);
-  const [sql, setSql] = useState('SELECT * FROM t LIMIT 100');
-  const [result, setResult] = useState<any[]>([]);
-  const [error, setError] = useState<string | null>(null);
-  const [isDbReady, setIsDbReady] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+export default function JsonSqlSearch({ initialData, className, renderResult, duckdbBundles }: JsonSqlSearchProps) {
+  // ... state ...
 
   useEffect(() => {
-    initDuckDB().then(() => setIsDbReady(true)).catch(console.error);
-  }, []);
+    initDuckDB(duckdbBundles)
+      .then(() => setIsDbReady(true))
+      .catch((err) => setInitError(err.message || 'Failed to initialize database'));
+  }, [duckdbBundles]);
 
   useEffect(() => {
     if (initialData && isDbReady) {
@@ -61,8 +64,14 @@ export default function JsonSqlSearch({ initialData, className }: JsonSqlSearchP
     <div className={`flex flex-col h-full w-full bg-white text-slate-900 ${className || ''}`}>
       <header className="flex items-center justify-between px-4 py-2 border-b bg-gray-50">
         <h1 className="font-bold text-lg text-slate-700">JSON SQL Search</h1>
-        <div className="text-xs text-gray-500">
-          {isDbReady ? '🟢 Engine Ready' : '🔴 Initializing...'}
+        <div className="text-xs">
+          {initError ? (
+            <span className="text-red-600 font-bold">❌ {initError}</span>
+          ) : isDbReady ? (
+            <span className="text-green-600">🟢 Engine Ready</span>
+          ) : (
+            <span className="text-gray-500">🔴 Initializing...</span>
+          )}
         </div>
       </header>
       
@@ -112,6 +121,7 @@ export default function JsonSqlSearch({ initialData, className }: JsonSqlSearchP
                    value={sql} 
                    onChange={(val) => setSql(val || '')} 
                    schema={schema}
+                   onRun={() => runQuery(sql)}
                  />
                </Suspense>
             </div>
@@ -123,7 +133,7 @@ export default function JsonSqlSearch({ initialData, className }: JsonSqlSearchP
           </div>
 
           <div className="flex-1 flex flex-col min-h-0 bg-white">
-             <ResultTable data={result} error={error} />
+             {renderResult ? renderResult(result, error) : <ResultTable data={result} error={error} />}
           </div>
         </section>
       </div>
