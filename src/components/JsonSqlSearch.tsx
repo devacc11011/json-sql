@@ -1,17 +1,16 @@
+'use client';
+
 import React, { useState, useEffect, Suspense } from 'react';
 // import dynamic from 'next/dynamic'; // Removed to avoid Next.js dependency in lib
 import JsonInput from './JsonInput';
 import ResultTable from './ResultTable';
 import { flattenJson } from '../lib/flatten';
 import { inferSchema, ColumnSchema } from '../lib/schema';
-import { initDuckDB, loadTable, executeQuery, formatError } from '../lib/sqlEngine';
+import { initDuckDB, executeQuery, formatError, loadTable } from '../lib/sqlEngine';
+import * as duckdb from '@duckdb/duckdb-wasm';
 
 // Lazy load Monaco Editor
 const SqlEditor = React.lazy(() => import('./SqlEditor'));
-
-import * as duckdb from '@duckdb/duckdb-wasm';
-
-// ... imports ...
 
 export interface JsonSqlSearchProps {
   initialData?: any;
@@ -21,7 +20,14 @@ export interface JsonSqlSearchProps {
 }
 
 export default function JsonSqlSearch({ initialData, className, renderResult, duckdbBundles }: JsonSqlSearchProps) {
-  // ... state ...
+  const [schema, setSchema] = useState<ColumnSchema[]>([]);
+  const [sql, setSql] = useState('SELECT * FROM t LIMIT 100');
+  const [result, setResult] = useState<any[]>([]);
+  const [error, setError] = useState<string | null>(null);
+  
+  const [isDbReady, setIsDbReady] = useState(false);
+  const [initError, setInitError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     initDuckDB(duckdbBundles)
