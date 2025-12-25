@@ -35,10 +35,18 @@ export async function loadTable(rows: FlatRow[], tableName: string = 't') {
   // insertJSON automatically infers schema.
   
   await conn.query(`DROP TABLE IF EXISTS "${tableName}"`);
+
+  // Alternative: Write JSON to a virtual file and load it
+  const jsonContent = JSON.stringify(rows);
+  const fileName = `${tableName}.json`;
   
-  // insertJSON internally uses a registered file and copy statement.
-  // It handles schema inference.
-  await conn.insertJSON(rows, { name: tableName, schema: 'auto' });
+  await db!.registerFileText(fileName, jsonContent);
+  
+  // Create table using read_json_auto
+  await conn.query(`CREATE TABLE "${tableName}" AS SELECT * FROM read_json_auto('${fileName}')`);
+  
+  // Optional: Cleanup file? Not strictly necessary in memory DB but good practice if repeated
+  // await db!.registerFileText(fileName, ''); 
 }
 
 export async function executeQuery(sql: string) {

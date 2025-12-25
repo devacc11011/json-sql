@@ -1,15 +1,13 @@
-'use client';
-
-import React, { useState, useEffect } from 'react';
-import dynamic from 'next/dynamic';
+import React, { useState, useEffect, Suspense } from 'react';
+// import dynamic from 'next/dynamic'; // Removed to avoid Next.js dependency in lib
 import JsonInput from './JsonInput';
 import ResultTable from './ResultTable';
 import { flattenJson } from '../lib/flatten';
 import { inferSchema, ColumnSchema } from '../lib/schema';
 import { initDuckDB, loadTable, executeQuery, formatError } from '../lib/sqlEngine';
 
-// Dynamic import for Monaco to avoid SSR issues in Next.js
-const SqlEditor = dynamic(() => import('./SqlEditor'), { ssr: false });
+// Lazy load Monaco Editor
+const SqlEditor = React.lazy(() => import('./SqlEditor'));
 
 export interface JsonSqlSearchProps {
   initialData?: any;
@@ -109,11 +107,13 @@ export default function JsonSqlSearch({ initialData, className }: JsonSqlSearchP
               </button>
             </div>
             <div className="flex-1 relative">
-               <SqlEditor 
-                 value={sql} 
-                 onChange={(val) => setSql(val || '')} 
-                 schema={schema}
-               />
+               <Suspense fallback={<div className="flex items-center justify-center h-full">Loading Editor...</div>}>
+                 <SqlEditor 
+                   value={sql} 
+                   onChange={(val) => setSql(val || '')} 
+                   schema={schema}
+                 />
+               </Suspense>
             </div>
             {isLoading && (
                  <div className="absolute inset-0 bg-white/50 flex items-center justify-center z-20">
